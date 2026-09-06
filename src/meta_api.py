@@ -43,27 +43,14 @@ class MetaAPI:
         return payload
 
     def discover_page(self, user_access_token, page_id):
-        """
-        Retrieve the configured Facebook Page directly.
-
-        We intentionally do not use /me/accounts because the
-        current Meta setup is able to access the Page directly
-        while /me/accounts returns an empty list.
-        """
-
-        fields = (
-            "id,name,access_token,"
-            "tasks,instagram_business_account"
-        )
-
         return self._request(
             "GET",
             f"/{page_id}",
             params={
-                "fields": fields,
+                "fields": "id,name,access_token,instagram_business_account",
                 "access_token": user_access_token,
             },
-        )
+        )       
 
     def choose_account(
         self,
