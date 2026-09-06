@@ -5,9 +5,16 @@ from .meta_api import MetaAPI
 from .cloudinary import CloudinaryUploader
 from .ledger import PublicationLedger
 class Publisher:
-    def __init__(self,config:Config): self.config=config; self.meta=MetaAPI(config.meta_api_version); self.ledger=PublicationLedger(config.data_dir/"publications.json")
+    def __init__(self,config:Config): self.config=config; self.meta=MetaAPI(config.meta_api_version); self.ledger=PublicationLedger(config.data_dir/"publications.json")    
+    
     def discover(self):
-        self.config.validate_meta(); return self.meta.choose_account(self.config.meta_user_access_token,self.config.meta_page_name)
+        self.config.validate_meta()
+        return self.meta.choose_account(
+            self.config.meta_user_access_token,
+            self.config.meta_page_name,
+            self.config.meta_page_id,
+        )
+
     def validate(self,input_dir,caption):
         slides=find_six_slides(input_dir); self.config.validate_meta(); self.config.validate_cloudinary(); account=self.discover(); fp=self.ledger.fingerprint(slides,caption); return slides,account,fp,self.ledger.already_published(fp)
     def dry_run(self,input_dir,caption):
