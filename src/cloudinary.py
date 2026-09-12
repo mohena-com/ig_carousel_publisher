@@ -1,11 +1,11 @@
 from __future__ import annotations
+
+import hashlib
 import re
- 
 import time
 from pathlib import Path
 
 import requests
-
 
 class CloudinaryUploader:
     def __init__(
