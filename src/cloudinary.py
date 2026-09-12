@@ -8,7 +8,13 @@ import requests
 
 
 class CloudinaryUploader:
-    def __init__(self, cloud_name, api_key, api_secret, folder):
+    def __init__(
+        self,
+        cloud_name,
+        api_key,
+        api_secret,
+        folder,
+    ):
         self.cloud_name = cloud_name
         self.api_key = api_key
         self.api_secret = api_secret
@@ -20,13 +26,22 @@ class CloudinaryUploader:
             f"&public_id={public_id}"
             f"&timestamp={timestamp}"
         )
+
         return hashlib.sha1(
             (params + self.api_secret).encode()
         ).hexdigest()
 
-    def upload_jpeg(self, path: Path, public_id):
-        ts = str(int(time.time()))
-        sig = self._signature(ts, public_id)
+    def upload_jpeg(
+        self,
+        path: Path,
+        public_id,
+    ):
+        timestamp = str(int(time.time()))
+
+        signature = self._signature(
+            timestamp,
+            public_id,
+        )
 
         url = (
             f"https://api.cloudinary.com/v1_1/"
@@ -34,7 +49,7 @@ class CloudinaryUploader:
         )
 
         with path.open("rb") as fh:
-            r = requests.post(
+            response = requests.post(
                 url,
                 files={
                     "file": (
@@ -45,32 +60,35 @@ class CloudinaryUploader:
                 },
                 data={
                     "api_key": self.api_key,
-                    "timestamp": ts,
+                    "timestamp": timestamp,
                     "folder": self.folder,
                     "public_id": public_id,
-                    "signature": sig,
+                    "signature": signature,
                 },
                 timeout=90,
             )
 
         try:
-            payload = r.json()
+            payload = response.json()
         except Exception:
-            payload = {"raw": r.text}
+            payload = {"raw": response.text}
 
-        if not r.ok:
+        if not response.ok:
             raise RuntimeError(
-                f"Cloudinary upload failed: {r.status_code} {payload}"
+                "Cloudinary upload failed: "
+                f"{response.status_code} {payload}"
             )
 
         secure_url = payload.get("secure_url")
+
         if not secure_url:
             raise RuntimeError(
-                f"Cloudinary did not return secure_url: {payload}"
+                "Cloudinary did not return secure_url: "
+                f"{payload}"
             )
 
-        # Meta's Instagram media fetcher works reliably with
-        # Cloudinary's explicit JPEG transformation.
+        # Meta's Instagram media fetcher has proven reliable with
+        # an explicit JPEG delivery transformation.
         meta_url = secure_url.replace(
             "/image/upload/",
             "/image/upload/f_jpg,q_90/",
