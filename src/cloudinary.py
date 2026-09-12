@@ -94,7 +94,6 @@ class CloudinaryUploader:
             "/image/upload/f_jpg,q_90/",
             1,
         )
-
         payload["meta_secure_url"] = meta_url
 
         return payload
