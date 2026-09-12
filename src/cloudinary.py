@@ -3,9 +3,11 @@ from __future__ import annotations
 import hashlib
 import re
 import time
+from io import BytesIO
 from pathlib import Path
 
 import requests
+from PIL import Image
 
 
 class CloudinaryUploader:
@@ -32,6 +34,65 @@ class CloudinaryUploader:
             (params + self.api_secret).encode()
         ).hexdigest()
 
+    def _wait_until_ready(
+        self,
+        url,
+        timeout=15,
+        interval=1,
+    ):
+        """
+        Wait until the Cloudinary delivery URL is reachable
+        and returns a valid JPEG that Pillow can decode.
+        """
+        deadline = time.time() + timeout
+        last_error = None
+
+        while time.time() < deadline:
+            try:
+                response = requests.get(
+                    url,
+                    timeout=10,
+                )
+
+                content_type = (
+                    response.headers.get(
+                        "content-type",
+                        "",
+                    )
+                    .split(";")[0]
+                    .strip()
+                    .lower()
+                )
+
+                if response.status_code == 200:
+                    if content_type == "image/jpeg":
+                        with Image.open(
+                            BytesIO(response.content)
+                        ) as image:
+                            image.verify()
+
+                        return
+
+                    last_error = (
+                        f"HTTP 200 but unexpected "
+                        f"Content-Type: {content_type}"
+                    )
+                else:
+                    last_error = (
+                        f"HTTP {response.status_code}"
+                    )
+
+            except Exception as exc:
+                last_error = str(exc)
+
+            time.sleep(interval)
+
+        raise RuntimeError(
+            "Cloudinary asset was not ready for Meta "
+            f"after {timeout} seconds: {url}. "
+            f"Last error: {last_error}"
+        )
+
     def upload_jpeg(
         self,
         path: Path,
@@ -44,14 +105,14 @@ class CloudinaryUploader:
             public_id,
         )
 
-        url = (
+        upload_url = (
             f"https://api.cloudinary.com/v1_1/"
             f"{self.cloud_name}/image/upload"
         )
 
         with path.open("rb") as fh:
             response = requests.post(
-                url,
+                upload_url,
                 files={
                     "file": (
                         path.name,
@@ -72,7 +133,9 @@ class CloudinaryUploader:
         try:
             payload = response.json()
         except Exception:
-            payload = {"raw": response.text}
+            payload = {
+                "raw": response.text
+            }
 
         if not response.ok:
             raise RuntimeError(
@@ -88,18 +151,27 @@ class CloudinaryUploader:
                 f"{payload}"
             )
 
-        # Meta's media fetcher accepts the Cloudinary image
-        # when it is explicitly delivered as an optimized JPEG.
+        # Meta requires Cloudinary to deliver the asset
+        # through an explicit JPEG transformation.
         #
         # IMPORTANT:
-        # Do not use the versioned Cloudinary URL directly.
-        # We insert q_auto,f_jpg immediately after /image/upload/.
+        # Keep the Cloudinary version segment.
+        #
+        # Example:
+        # /image/upload/v123456789/...
+        #
+        # becomes:
+        # /image/upload/q_auto,f_jpg/v123456789/...
         meta_url = re.sub(
             r"/image/upload/",
             "/image/upload/q_auto,f_jpg/",
             secure_url,
             count=1,
         )
+
+        # Make sure Cloudinary's delivery edge is actually
+        # returning a valid JPEG before asking Meta to fetch it.
+        self._wait_until_ready(meta_url)
 
         payload["meta_secure_url"] = meta_url
 
