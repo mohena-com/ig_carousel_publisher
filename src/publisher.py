@@ -26,7 +26,7 @@ class Publisher:
         jpegs=convert_to_jpegs(slides,self.config.data_dir/"tmp"/input_dir.name)
         up=CloudinaryUploader(self.config.cloudinary_cloud_name,self.config.cloudinary_api_key,self.config.cloudinary_api_secret,self.config.cloudinary_folder)
         urls=[]
-        for i,jpeg in enumerate(jpegs,1): print(f"Uploading slide {i}/6..."); urls.append(up.upload_jpeg(jpeg,f"{input_dir.name}/slide_{i}")["secure_url"])
+        for i,jpeg in enumerate(jpegs,1): print(f"Uploading slide {i}/6..."); urls.append(up.upload_jpeg(jpeg, f"{input_dir.name}/slide_{i}")["meta_secure_url"])
         child=[]
         for i,url in enumerate(urls,1): print(f"Creating Instagram child container {i}/6..."); child.append(self.meta.create_image_container(account.ig_user_id,account.page_access_token,url))
         print("Creating CAROUSEL container..."); carousel=self.meta.create_carousel_container(account.ig_user_id,account.page_access_token,child,caption)

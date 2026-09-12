@@ -62,6 +62,13 @@ CLOUDINARY_FOLDER=shaktidootam/instagram_jobs
 DEFAULT_HASHTAGS=#governmentjobs #sarkarijob #jobalert #indiajobs
 ```
 
+`````
+python3.1 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+``````````
+
+
 ## Discover the connected Page
 
 ```bash
@@ -81,11 +88,14 @@ This calls Meta's `/me/accounts` endpoint and selects the Page by `META_PAGE_NAM
 
 Dry run validates six slides, image readability, JPEG conversion, credentials, account discovery, and duplicate state. It does not create Instagram containers or publish.
 
+
+
+
 ## Real publication
 
 ```bash
 ./run.sh publish \
-  --input-dir "../output_carousel/JOB_NAME" \
+  --input-dir "../output_carousel/25_NTPC_Sail_Power_Company_Limited_NSPCL_Recruitment_2026_Apply_Online_For_16_Post_2026-09-07" \
   --caption "Latest government job notification. Check the slides for eligibility, dates, fees and application details." \
   --publish
 ```
@@ -116,3 +126,44 @@ instagram_carousel_publisher
         v
 ONE Instagram carousel on @shaktidootam
 ```
+
+
+https://console.cloudinary.com/app/c-a5fb9110a73e8087cfe4914353c4ac/settings/api-keys
+Login with VNIT Email id 
+
+
+Facebook
+Shaktidootam
+ID: 1283817824820147
+Owned by: Shakti Dootam
+
+1283817824820147?fields=access_token 
+page token 
+{
+  "access_token": "EAAWs7kFXp0UBSVNuMxdBpMOmfeequSLETVq22A2PvCG3dk7Y7Tc8aZBnJ9Vy7BfeFMDdVBk0ZAFV9cqMlMzJw6zeI7pycZAIbOqA7qORjke3z3No0Oih0ZC2m7ZAYgh3gpIZCQ0kcZBoaLmp2Bb8bNaav7bGSf2dBRKZAOfjdRj9LQyZBZAizbewa15oMJ0W0MpiqTRpG8hRXvC6aZBZAQSOebVu0oSoxJQIwJs4axIUrmUfWMP4XM5htTWeECGz",
+  "id": "1283817824820147"
+}
+
+
+{
+  "instagram_business_account": {
+    "id": "17841476001178700"
+  },
+  "id": "1283817824820147"
+}
+
+creation_id 
+{
+  "id": "17907239847533373"
+}
+
+response_id
+{
+  "id": "18130346020665145"
+}
+
+
+stoken App ID 1597514182010693 
+App secret 277af0dcbe95564fc4170424b7a10c4c
+​
+EAAWs7kFXp0UBSfr9DYN0V3P243hCzaPFkk3HFCT5pnEcfOt6wxLGaJTiBdZCIYQFFphQCnPWBZAeA65ttZAPxzcheeuWcBSlZBr2Ucf8yogzXm2ZAqctNSPZBVONxGZCc0ESZBKGMfYK80ucua8ZAAg1PBfqNpZBfUqnyZBULJagZAakjlyz4agd5o7fZAe7WleWpiuJq3ZBfFjc0tqdNwkP4OOec13IPqdOPifbbDTiDub4ozWQHGL7KEqgxp0uqHhq7ZCdjUvtQuUdCw0nZBifDfqYZCPOMWi7kxibao1nW6VEZD
