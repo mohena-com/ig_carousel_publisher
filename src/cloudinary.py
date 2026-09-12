@@ -7,6 +7,7 @@ from pathlib import Path
 
 import requests
 
+
 class CloudinaryUploader:
     def __init__(
         self,
@@ -87,17 +88,19 @@ class CloudinaryUploader:
                 f"{payload}"
             )
 
-        # The uploaded asset is already a normalized JPEG.
-        # Meta accepts the plain Cloudinary delivery URL, but our
-        # testing showed Meta rejects the versioned delivery URL.
-        # Remove the Cloudinary version segment and do not apply
-        # any further image transformation.
+        # Meta's media fetcher accepts the Cloudinary image
+        # when it is explicitly delivered as an optimized JPEG.
+        #
+        # IMPORTANT:
+        # Do not use the versioned Cloudinary URL directly.
+        # We insert q_auto,f_jpg immediately after /image/upload/.
         meta_url = re.sub(
-            r"/image/upload/v\d+/",
-            "/image/upload/",
+            r"/image/upload/",
+            "/image/upload/q_auto,f_jpg/",
             secure_url,
             count=1,
         )
+
         payload["meta_secure_url"] = meta_url
 
         return payload
