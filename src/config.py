@@ -22,6 +22,7 @@ class Config:
     def validate_cloudinary(self):
         missing=[n for n,v in [("CLOUDINARY_CLOUD_NAME",self.cloudinary_cloud_name),("CLOUDINARY_API_KEY",self.cloudinary_api_key),("CLOUDINARY_API_SECRET",self.cloudinary_api_secret)] if not v]
         if missing: raise RuntimeError("Missing Cloudinary settings in .env: "+", ".join(missing))
+        
     
     def validate_meta(self):
         missing = []
