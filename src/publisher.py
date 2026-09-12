@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import time
 import uuid
+import hashlib
 
 from .config import Config
 from .images import (
@@ -102,24 +103,28 @@ class Publisher:
         slide_number,
         recovery=False,
     ):
+        seed = f"{input_dir.name}|slide_{slide_number}"
+
+        short_hash = hashlib.sha256(
+            seed.encode("utf-8")
+        ).hexdigest()[:12]
+
         if recovery:
-            unique_id = (
-                f"{input_dir.name}/"
-                f"slide_{slide_number}_recovery_"
-                f"{uuid.uuid4().hex[:12]}"
+            public_id = (
+                f"ig_{short_hash}_s{slide_number}_recovery_"
+                f"{uuid.uuid4().hex[:8]}"
             )
         else:
-            unique_id = (
-                f"{input_dir.name}/"
-                f"slide_{slide_number}"
+            public_id = (
+                f"ig_{short_hash}_s{slide_number}"
             )
 
         result = uploader.upload_jpeg(
             jpeg,
-            unique_id,
+            public_id,
         )
 
-        return result["meta_secure_url"]
+        return result["meta_secure_url"] 
 
     def _create_child_with_retry(
         self,

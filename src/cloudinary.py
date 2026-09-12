@@ -1,6 +1,6 @@
 from __future__ import annotations
-
-import hashlib
+import re
+ 
 import time
 from pathlib import Path
 
@@ -85,9 +85,19 @@ class CloudinaryUploader:
             raise RuntimeError(
                 "Cloudinary did not return secure_url: "
                 f"{payload}"
-            )   
+            )
 
-        
-        payload["meta_secure_url"] = secure_url
+        # The uploaded asset is already a normalized JPEG.
+        # Meta accepts the plain Cloudinary delivery URL, but our
+        # testing showed Meta rejects the versioned delivery URL.
+        # Remove the Cloudinary version segment and do not apply
+        # any further image transformation.
+        meta_url = re.sub(
+            r"/image/upload/v\d+/",
+            "/image/upload/",
+            secure_url,
+            count=1,
+        )
+        payload["meta_secure_url"] = meta_url
 
         return payload
