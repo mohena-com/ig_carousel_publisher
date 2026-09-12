@@ -154,7 +154,7 @@ class Publisher:
 
             print(
                 f"Meta rejected slide {slide_number}. "
-                "Freshly re-encoding and retrying once..."
+                "Creating a fully normalized recovery JPEG and retrying once..."
             )
 
             recovery_dir = (
@@ -245,10 +245,12 @@ class Publisher:
         child = []
 
         try:
-            # IMPORTANT:
-            # We create child containers one by one, but we do
-            # NOT create the carousel until all six succeed.
+            # SAFETY GATE / PREFLIGHT:
+            # Each child container is Meta's media-fetch validation.
+            # Create ALL six child containers first; only create the
+            # carousel after every image has been accepted by Meta.
             for i, jpeg in enumerate(jpegs, 1):
+                print(f"Preflight/uploading slide {i}/6...")
                 child_id = self._create_child_with_retry(
                     account,
                     uploader,
