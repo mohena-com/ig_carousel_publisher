@@ -85,15 +85,9 @@ class CloudinaryUploader:
             raise RuntimeError(
                 "Cloudinary did not return secure_url: "
                 f"{payload}"
-            )
+            )   
 
-        # Meta's Instagram media fetcher has proven reliable with
-        # an explicit JPEG delivery transformation.
-        meta_url = secure_url.replace(
-            "/image/upload/",
-            "/image/upload/f_jpg,q_90/",
-            1,
-        )
-        payload["meta_secure_url"] = meta_url
+        
+        payload["meta_secure_url"] = secure_url
 
         return payload
